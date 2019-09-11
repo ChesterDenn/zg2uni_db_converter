@@ -53,10 +53,14 @@ def convert(url, db, port, user, password):
 		primaryKeyColName = table.primary_key.columns.values()[0].name
 
 		unique_col_name = []
+
+		# No Need to check unique column
+		'''
 		for constraint in sorted(table.constraints):
 			if isinstance(constraint, UniqueConstraint):
 				for col in constraint.columns:
 					unique_col_name.append(col.name)
+		'''
 
 		for result in results:
 			data = {}
@@ -64,8 +68,10 @@ def convert(url, db, port, user, password):
 				if(column == primaryKeyColName):
 					continue
 				else:
-					if(type(value) == str or type(value) == unicode) and (column not in unique_col_name) and str(table.columns[column].type) in ['CHAR', 'VARCHAR']:
+					if(type(value) == str or type(value) == unicode) and str(table.columns[column].type) in ['CHAR', 'VARCHAR']:
 						data.update({column: zg2uni(value)})
+					# if(type(value) == str or type(value) == unicode) and (column not in unique_col_name) and str(table.columns[column].type) in ['CHAR', 'VARCHAR']:
+						# data.update({column: zg2uni(value)})
 			if data:
 				# _logger.debug(data)
 				update_rec = update(table).where(primaryKeyCol==result[primaryKeyColName])
