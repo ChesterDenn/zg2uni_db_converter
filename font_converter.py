@@ -814,28 +814,14 @@ def replace_with_rule(rule, value):
 		data = value
 	else:
 		data = value.decode("utf-8")
-	count = 0
+
 	for x in rule:
 		_from = x["from"]
 		_to = x["to"]
-
+		
 		try:
-			tmp = data
 			data = re_sub(_from, _to, data)
-			if tmp != data:
-				pass
-				#print(count)
 		except Exception as e:
 			print(e)
-		finally:
-			count = count + 1
 
 	return data
-
-
-if __name__ == '__main__':
-	result = zg2uni("( ၉.၉.၂၀၁၉) ရက္ေန႔၊ ( ၁၉း၃၅ ) အခ်ိန္ခန္႕၊ မႏၱေလးတုိင္းေဒသႀကီး၊ ျပည္ၾကီးတံခြန္ၿမိဳ႕နယ္၊( ၇၀x၇၁ ) ေဇာ္ဂ်ီလမ္းရွိ ဆုိင္ကယ္ပစၥည္းဂုိေထာင္တြင္ မီးေလာင္မႈျဖစ္ပြားေၾကာင္း သတင္းရရွိသျဖင့္ Level 1 ယာဥ္အုပ္စုမ်ားထြက္ခြာျငွိမ္းသတ္ခဲ့ျပီး (၁၉း၄၀) အခ်ိန္တြင္ မီးျငိမ္းပါသည္။")
-
-	with open("converted.txt", "w") as file:
-		file.write(result.encode("utf-8"))
-		file.close()

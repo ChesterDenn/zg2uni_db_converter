@@ -14,10 +14,23 @@ logging.basicConfig(format='Zawgyi To Unicode (%(asctime)s) - %(message)s', leve
 _logger = logging.getLogger(__name__)
 
 
-def convert(url, db, port, user, password):
-	engine = create_engine("postgresql://%s:%s@%s:%s/%s" % (user, password, url, port, db))
-	if not database_exists(engine.url):
-		print("Database doesn't exist.")
+def convert(option, url, db, port, user, password):
+
+	address = None
+	if option == 1:
+		address = "postgresql://%s:%s@%s:%s/%s" % (user, password, url, port, db)
+	elif option == 2:
+		address = "mysql+pymysql://%s:%s@%s:%s/%s" % (user, password, url, port, db)
+
+	engine = create_engine(address)
+
+	try:
+		if not database_exists(engine.url):
+			print("Database doesn't exist.")
+			return
+	except Exception as dbex:
+		print(dbex)
+		return
 
 	conn = engine.connect()
 
@@ -28,14 +41,14 @@ def convert(url, db, port, user, password):
 
 	for table_name in engine.table_names():
 
-		# _logger.info("Fetching %s... \t\t\t\t\t\t\t\t\t%d%%" % (table_name, 5*count))
+		_logger.info("%d%% - Fetching %s..." % ((count * 100/table_count), table_name))
 
 		count = count + 1
 
-		sys.stdout.write('\r')
-		sys.stdout.write("%d%% - Fetching %s..." % ((count * 100/table_count), table_name))
+		# sys.stdout.write('\r')
+		# sys.stdout.write("%d%% - Fetching %s..." % ((count * 100/table_count), table_name))
 		# sys.stdout.write("[%-20s] %d%% - Fetching %s..." % ('='*(count * 100/table_count), (count * 100/table_count), table_name))
-		sys.stdout.flush()
+		# sys.stdout.flush()
 
 		metadata = MetaData(bind=engine)
 		table = Table(table_name, metadata, autoload=True, autoload_with=engine)
@@ -46,7 +59,7 @@ def convert(url, db, port, user, password):
 
 
 		if not table.primary_key.columns:
-			# _logger.info("Skipped %s because there is no have primary key." % table_name)
+			_logger.info("Skipped %s because there is no have primary key." % table_name)
 			continue
 
 		primaryKeyCol = table.primary_key.columns.values()[0]
@@ -54,26 +67,16 @@ def convert(url, db, port, user, password):
 
 		unique_col_name = []
 
-		# No Need to check unique column
-		'''
-		for constraint in sorted(table.constraints):
-			if isinstance(constraint, UniqueConstraint):
-				for col in constraint.columns:
-					unique_col_name.append(col.name)
-		'''
-
 		for result in results:
 			data = {}
 			for column, value in result.items():
 				if(column == primaryKeyColName):
 					continue
 				else:
-					if(type(value) == str or type(value) == unicode) and str(table.columns[column].type) in ['CHAR', 'VARCHAR']:
+					if(type(value) == str or type(value) == unicode) and \
+						table.columns[column].type.__visit_name__ in ['CHAR', 'VARCHAR', 'TEXT']:
 						data.update({column: zg2uni(value)})
-					# if(type(value) == str or type(value) == unicode) and (column not in unique_col_name) and str(table.columns[column].type) in ['CHAR', 'VARCHAR']:
-						# data.update({column: zg2uni(value)})
 			if data:
-				# _logger.debug(data)
 				update_rec = update(table).where(primaryKeyCol==result[primaryKeyColName])
 				update_rec = update_rec.values(data)
 				session.execute(update_rec)
@@ -87,15 +90,38 @@ def convert(url, db, port, user, password):
 
 if __name__ == '__main__':
 
-	f = Figlet(font='cybermedium')
-	print(f.renderText('Zawgyi To Unicode Database Converter Tool.\n'))
+	try:
+		f = Figlet(font='cybermedium')
+		print(f.renderText('Zawgyi To Unicode Database Converter Tool.\n'))
+		print('Please select database type: \n')
+		print('[1]: Postgresql\n')
+		print('[2]:  Mysql\n')
 
-	#print("Zawgyi To Unicode Database Converter Tool.\n\n")
+		def choose_db():
+			url_preix = raw_input("Select Database: ")
+			try:
+				if int(url_preix) not in [1, 2]:
+					return choose_db()
+				return int(url_preix)
+			except Exception as ex:
+				return choose_db()
 
-	db_name = raw_input("Database name: ")
-	db_route = raw_input("Database route: ")
-	db_port = raw_input("Database port: ")
-	user_name = raw_input("User name: ")
-	password = getpass.getpass("Password: ")
+		db_type = choose_db()
+		db_name = raw_input("Database name: ")
+		db_route = raw_input("Database route: ")
 
-	convert(db_route, db_name, db_port, user_name, password)
+		def request_port():
+			db_port = raw_input("Database port: ")
+			try:
+				return int(db_port)
+			except Exception as ex:
+				print("Please input port number\n")
+				return request_port()
+
+		db_port = request_port()
+		user_name = raw_input("User name: ")
+		password = getpass.getpass("Password: ")
+
+		convert(db_type, db_route, db_name, db_port, user_name, password)
+	except KeyboardInterrupt as ke:
+		print("Abort!")
