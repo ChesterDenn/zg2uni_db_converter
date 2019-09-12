@@ -24,7 +24,9 @@ python convert.py
 ```
 
 ### Run with pip
-And then check your machine is installed **pip**. If you don't install yet, please install the **pip**.
+If you want to run app with pip please check your machine is installed **pip** first. If you don't install yet, please install the **pip**.
+
+> Note: run with pip require Python 2.7.5+. This app doesn't support Python 3+
 
 After installed pipenv, go to the repo and please type
 ```sh
