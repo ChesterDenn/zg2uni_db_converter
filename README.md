@@ -1,5 +1,8 @@
 # Zawgyi To Unicode Database Converter Tool
 
+# *** At Your Own Risk***
+**Before you convert, please back up your database first.**
+
 This repo is zawgyi to unicode font converter for database tool. Currently available database are **Postgresql**, **Mysql** and **Sqlite**.
 
 ## Usage
@@ -33,7 +36,7 @@ $ python convert.py
 ### Run with pip
 If you want to run app with pip please check your machine is installed **pip** first. If you don't install yet, please install the **pip**.
 
-> Note: run with pip require Python 2.7.5+. This app doesn't support Python 3+
+> Note: run with pip require Python 2.7.15+. This app doesn't support Python 3+
 
 After installed pipenv, go to the repo and please type
 ```sh
