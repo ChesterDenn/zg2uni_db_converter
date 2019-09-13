@@ -111,7 +111,7 @@ if __name__ == '__main__':
 		db_route = raw_input("Database route: ")
 
 		def request_port():
-			db_port = raw_input("Database port: ")
+			db_port = raw_input("Database port: ")# test
 			try:
 				return int(db_port)
 			except Exception as ex:
