@@ -13,6 +13,10 @@ from font_converter import uni2zg, zg2uni
 logging.basicConfig(format='Zawgyi To Unicode (%(asctime)s) - %(message)s', level=logging.INFO)
 _logger = logging.getLogger(__name__)
 
+possible_fields = [
+	'CHAR', 'VARCHAR', 'NCHAR', 'NVARCHAR', 'TEXT', 'Text', 'String', 
+	'Unicode', 'UnicodeText', 'JSON', 'TINYTEXT', 'MEDIUMTEXT', 'LONGTEXT'
+]
 
 def convert(option, url, db, port, user, password):
 
@@ -65,8 +69,6 @@ def convert(option, url, db, port, user, password):
 		primaryKeyCol = table.primary_key.columns.values()[0]
 		primaryKeyColName = table.primary_key.columns.values()[0].name
 
-		unique_col_name = []
-
 		for result in results:
 			data = {}
 			for column, value in result.items():
@@ -74,7 +76,7 @@ def convert(option, url, db, port, user, password):
 					continue
 				else:
 					if(type(value) == str or type(value) == unicode) and \
-						table.columns[column].type.__visit_name__ in ['CHAR', 'VARCHAR', 'TEXT']:
+						table.columns[column].type.__visit_name__ in possible_fields:
 						data.update({column: zg2uni(value)})
 			if data:
 				update_rec = update(table).where(primaryKeyCol==result[primaryKeyColName])
