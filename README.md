@@ -1,11 +1,18 @@
 # Zawgyi To Unicode Database Converter Tool
 
-This repo is zawgyi to unicode font converter for database tool. Currently available database are **Postgresql** and **Mysql**.
+This repo is zawgyi to unicode font converter for database tool. Currently available database are **Postgresql**, **Mysql** and **Sqlite**.
 
 ## Usage
 Clone this repo to your machine
 ```sh
 git clone https://github.com/ChesterDenn/zg2uni_db_converter.git
+```
+
+### Define ignore record
+You can define table of which record skip ignore by primary column of value in **config.ini**
+```sh
+[ignore_table]
+YOUR_TABLE_NAME = YOUR_P_COL_ID1, YOUR_P_COL_ID2, YOUR_P_COL_ID3
 ```
 
 ### Run with python virtual environment
@@ -20,7 +27,7 @@ $ pipenv shell
 And run with
 
 ```sh
-python convert.py
+$ python convert.py
 ```
 
 ### Run with pip
@@ -36,6 +43,6 @@ $ pip install -r requirements.txt
 And run with
 
 ```sh
-python convert.py
+$ python convert.py
 ```
- > Special thanks to SatanGod for Rabbit JS font converter.
+ > Special thanks to SaturnGod for Rabbit JS font converter.
